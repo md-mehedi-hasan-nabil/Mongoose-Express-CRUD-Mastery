@@ -1,17 +1,11 @@
+import { Order } from "../order/order.interface";
 
-
-interface Order {
-    productName: string;
-    price: number;
-    quantity: number;
-}
-
-interface Name {
+export interface Name {
     firstName: string;
     lastName: string;
 }
 
-interface Address {
+export interface Address {
     street: string;
     city: string;
     country: string;
@@ -25,7 +19,7 @@ export interface User {
     age: number;
     email: string;
     isActive: boolean;
-    hobbies: string;
+    hobbies: [string];
     address: Address,
     orders: [Order]
 }
