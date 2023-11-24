@@ -1,25 +1,34 @@
+import { Model } from "mongoose";
 import { Order } from "../order/order.interface";
 
-export interface Name {
+export interface TFullName {
     firstName: string;
     lastName: string;
 }
 
-export interface Address {
+export interface TAddress {
     street: string;
     city: string;
     country: string;
 }
 
-export interface User {
-    userId: string;
+export interface TUser {
+    userId: number;
     username: string;
     password: string;
-    name: Name;
+    fullName: TFullName;
     age: number;
     email: string;
     isActive: boolean;
     hobbies: [string];
-    address: Address,
-    orders: [Order]
+    address: TAddress,
+    orders: [Order],
+    isDeleted: boolean
 }
+
+export interface IUserMethods {
+    isUserExists(userId: number): Promise<TUser | null>;
+}
+
+
+export type TUserModel = Model<TUser, Record<string, never>, IUserMethods>;

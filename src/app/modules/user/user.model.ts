@@ -1,8 +1,10 @@
+import bcrypt from "bcrypt"
 import { Schema, model } from "mongoose";
-import { Address, Name, User } from "./user.interface";
+import { TAddress, TFullName, IUserMethods, TUser, TUserModel } from "./user.interface";
 import { orderSchema } from '../order/order.model';
+import config from "../../config";
 
-const nameSchema = new Schema<Name>({
+const fullNameSchema = new Schema<TFullName>({
     firstName: {
         type: String,
         required: [true, "User firstname is required."]
@@ -13,7 +15,7 @@ const nameSchema = new Schema<Name>({
     }
 })
 
-const addressSchema = new Schema<Address>({
+const addressSchema = new Schema<TAddress>({
     street: {
         type: String,
         required: [true, "Street is required."]
@@ -28,20 +30,22 @@ const addressSchema = new Schema<Address>({
     }
 })
 
-const userSchema = new Schema<User>({
+const userSchema = new Schema<TUser, TUserModel, IUserMethods>({
     userId: {
-        type: String,
+        type: Number,
+        unique: true,
         required: [true, "User id is required."]
     },
     username: {
         type: String,
+        unique: true,
         required: [true, "Username id is required."]
     },
     password: {
         type: String,
         required: [true, "Password id is required."]
     },
-    name: nameSchema,
+    fullName: fullNameSchema,
     age: {
         type: Number,
         required: [true, "Age id is required."]
@@ -59,9 +63,35 @@ const userSchema = new Schema<User>({
         required: [true, "Hobbies are required."]
     },
     address: addressSchema,
-    orders: [orderSchema]
+    orders: [orderSchema],
+    isDeleted: {
+        type: Boolean,
+        default: false
+    }
+})
+
+/**
+ * password hash before save data
+ */
+userSchema.pre("save", async function (next) {
+    const hashPassword = await bcrypt.hash(this.password, Number(config.saltRounds));
+    this.password = hashPassword;
+
+    next()
+})
+
+userSchema.pre("find", async function (next) {
+    this.find().select("-password -isDeleted -_id -fullName._id -address._id")
+
+    next()
 })
 
 
-const UserModel = model<User>('User', userSchema);
+userSchema.methods.isUserExists = async function (userId: number) {
+    const existingUser = await UserModel.findOne({ userId })
+
+    return existingUser
+}
+
+const UserModel = model<TUser, TUserModel>('user', userSchema);
 export default UserModel;
