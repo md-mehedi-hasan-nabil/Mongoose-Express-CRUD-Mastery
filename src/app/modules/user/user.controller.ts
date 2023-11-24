@@ -31,7 +31,7 @@ async function getSingleUser(req: Request, res: Response) {
 
         res.status(200).json({
             success: true,
-            message: "Users fetched successfully!",
+            message: "User fetched successfully!",
             data: user,
         });
     } catch (error) {
@@ -67,7 +67,7 @@ async function createNewUser(req: Request, res: Response) {
 
         const newUser = await userService.createUser(value)
 
-        res.status(200).json({
+        res.status(201).json({
             success: true,
             message: "User created successfully!",
             data: newUser,
@@ -84,15 +84,18 @@ async function createNewUser(req: Request, res: Response) {
     }
 }
 
+/**
+ * update user information
+ */
 async function updateUserInfo(req: Request, res: Response) {
     try {
-        const { user } = req.body;
-        const updatedUserInfo = await userService.updateUser(user);
+        const userId = req.params.userId;
+        const updatedUserInfo = await userService.updateUser(Number(userId), req.body);
 
         res.status(200).json({
             success: true,
-            message: "User data find successful.",
-            data: user,
+            message: "User updated successfully!",
+            data: updatedUserInfo,
         });
     } catch (error) {
         res.status(500).json({
@@ -103,6 +106,8 @@ async function updateUserInfo(req: Request, res: Response) {
     }
 }
 
+
+
 export default {
-    getAllUsers, getSingleUser, createNewUser, updateUserInfo
+    getAllUsers, getSingleUser, createNewUser, updateUserInfo,
 }

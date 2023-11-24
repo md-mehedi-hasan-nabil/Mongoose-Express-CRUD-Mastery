@@ -80,9 +80,25 @@ userSchema.pre("save", async function (next) {
     next()
 })
 
+/**
+ * find all user
+ */
 userSchema.pre("find", async function (next) {
-    this.find().select("-password -isDeleted -_id -fullName._id -address._id")
+    this.find().select("-password -isDeleted -_id -fullName._id -address._id -orders -__v")
 
+    next()
+})
+
+/**
+ * find single user
+ */
+userSchema.pre("findOne", async function (next) {
+    this.find().select("-password -isDeleted -_id -fullName._id -address._id -orders -__v")
+    next()
+})
+
+userSchema.post("updateOne", async function (doc, next) {
+    this.find().select("-password -isDeleted -_id -fullName._id -address._id -orders -__v")
     next()
 })
 

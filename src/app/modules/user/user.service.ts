@@ -20,14 +20,21 @@ async function createUser(user: TUser) {
         await newUser.save()
     }
 
-    const newData = await UserModel.findById(newUser._id).select("-password -isDeleted -_id -fullName._id -address._id");
+    const newData = await UserModel.findById(newUser._id).select("-password -isDeleted -_id -fullName._id -address._id -orders -__v");
 
     return newData;
 }
 
-function updateUser(userInfo: TUser) {
-    return UserModel.findByIdAndUpdate()
+async function updateUser(userId: number, userInfo: TUser) {
+    await UserModel.updateOne({ userId }, {
+        $set: userInfo
+    }, {new: true})
+
+    const newData = await UserModel.findOne({userId})
+
+    return newData;
 }
+
 
 export default {
     getUsers, getUser, createUser, updateUser
