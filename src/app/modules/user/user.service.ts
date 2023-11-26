@@ -5,8 +5,13 @@ function getUsers() {
     return UserModel.find().select("-password -isDeleted -_id -fullName._id -address._id -orders -__v")
 }
 
-function getUser(userId: number) {
-    return UserModel.findOne({ userId }).select("-password -isDeleted -_id -fullName._id -address._id -orders -__v")
+async function getUser(userId: number) {
+    if (await UserModel.isUserExists(userId)) {
+
+        return UserModel.findOne({ userId }).select("-password -isDeleted -_id -fullName._id -address._id -orders -__v")
+    } else {
+        throw new Error("User not found.")
+    }
 }
 
 async function createUser(user: TUser) {
@@ -54,24 +59,33 @@ async function addOrder(userId: number, orderInfo: TOrder) {
     }
 }
 
-function getOrders(userId: number) {
-    return UserModel.findOne({ userId }).select("-_id orders")
+async function getOrders(userId: number) {
+    if (await UserModel.isUserExists(userId)) {
+        return UserModel.findOne({ userId }).select("-_id orders")
+    } else {
+        throw new Error("User not found.")
+    }
 }
 
 /**
  * calculate total price
  */
-function totalPrice(userId: number) {
-    return UserModel.aggregate([
-        { $match: { userId } }, 
-        { $unwind: '$orders' },
-        {
-            $group: {
-                _id: null,
-                totalAmount: { $sum: '$orders.price' },
-            },
-        }
-    ])
+async function totalPrice(userId: number) {
+    if (await UserModel.isUserExists(userId)) {
+        return UserModel.aggregate([
+            { $match: { userId } },
+            { $unwind: '$orders' },
+            {
+                $group: {
+                    _id: null,
+                    totalAmount: { $sum: '$orders.price' },
+                },
+            }
+        ])
+    } else {
+        throw new Error("User not found.")
+    }
+
 }
 
 export default {

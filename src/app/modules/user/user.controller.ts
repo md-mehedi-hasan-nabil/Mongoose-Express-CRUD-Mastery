@@ -37,13 +37,13 @@ async function getUserOrders(req: Request, res: Response) {
             message: "Order fetched successfully!",
             data: orders
         })
-    } catch (error) {
+    } catch (error: any) {
         res.status(500).json({
             success: false,
             message: "Order fetched failed!",
             error: {
-                "code": 404,
-                "description": "Server side error."
+                code: 404,
+                description: error?.message ? error?.message : "Server side error."
             }
         })
     }
@@ -85,7 +85,7 @@ async function createNewUser(req: Request, res: Response) {
                 message: "User data validation failed.",
                 "error": {
                     "code": 404,
-                    "description": error.details
+                    "description": error?.details
                 }
             })
         }
