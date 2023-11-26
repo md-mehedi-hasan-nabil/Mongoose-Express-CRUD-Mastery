@@ -170,7 +170,7 @@ async function addNewOrder(req: Request, res: Response) {
             res.status(201).json({
                 success: true,
                 message: "Order created successfully!",
-                data: result
+                data: null
             })
         } else {
             throw new Error("Product order failed.")

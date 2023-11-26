@@ -39,6 +39,9 @@ function deleteUser(userId: number) {
     return UserModel.deleteOne({ userId })
 }
 
+/**
+ * add new order
+ */
 async function addOrder(userId: number, orderInfo: TOrder) {
     if (await UserModel.isUserExists(userId)) {
         return UserModel.updateOne(
@@ -55,6 +58,9 @@ function getOrders(userId: number) {
     return UserModel.findOne({ userId }).select("-_id orders")
 }
 
+/**
+ * calculate total price
+ */
 function totalPrice(userId: number) {
     return UserModel.aggregate([
         { $match: { userId } }, 
