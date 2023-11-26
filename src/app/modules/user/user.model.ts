@@ -1,8 +1,22 @@
 import bcrypt from "bcrypt"
 import { Schema, model } from "mongoose";
-import { TAddress, TFullName, IUserMethods, TUser, TUserModel } from "./user.interface";
-import { orderSchema } from '../order/order.model';
+import { TAddress, TFullName, TOrder, TUser, TUserModel } from "./user.interface";
 import config from "../../config";
+
+export const orderSchema = new Schema<TOrder>({
+    productName: {
+        type: String,
+        required: [true, "Product name is required."]
+    },
+    price: {
+        type: Number,
+        required: [true, "Price is required."]
+    },
+    quantity: {
+        type: Number,
+        required: [true, "Quantity is required."]
+    }
+})
 
 const fullNameSchema = new Schema<TFullName>({
     firstName: {
@@ -30,7 +44,7 @@ const addressSchema = new Schema<TAddress>({
     }
 })
 
-const userSchema = new Schema<TUser, TUserModel, IUserMethods>({
+const userSchema = new Schema<TUser, TUserModel>({
     userId: {
         type: Number,
         unique: true,
@@ -83,31 +97,38 @@ userSchema.pre("save", async function (next) {
 /**
  * find all user
  */
-userSchema.pre("find", async function (next) {
-    this.find().select("-password -isDeleted -_id -fullName._id -address._id -orders -__v")
+// userSchema.pre("find", async function (next) {
+//     this.find().select("-password -isDeleted -_id -fullName._id -address._id -orders -__v")
 
-    next()
-})
+//     next()
+// })
 
 /**
  * find single user
  */
-userSchema.pre("findOne", async function (next) {
-    this.find().select("-password -isDeleted -_id -fullName._id -address._id -orders -__v")
-    next()
-})
-
+// userSchema.pre("findOne", async function (next) {
+//     console.log(this.req)
+//     this.find().select("-password -isDeleted -_id -fullName._id -address._id -orders -__v")
+//     next()
+// })
+/**
+ * after update operation 
+ */
 userSchema.post("updateOne", async function (doc, next) {
     this.find().select("-password -isDeleted -_id -fullName._id -address._id -orders -__v")
     next()
 })
 
-
-userSchema.methods.isUserExists = async function (userId: number) {
+/**
+ * create a custom static method
+ */
+userSchema.statics.isUserExists = async function (userId: number) {
     const existingUser = await UserModel.findOne({ userId })
 
-    return existingUser
+    return existingUser;
 }
+
+//TODO: If you can't find information about the user
 
 const UserModel = model<TUser, TUserModel>('user', userSchema);
 export default UserModel;

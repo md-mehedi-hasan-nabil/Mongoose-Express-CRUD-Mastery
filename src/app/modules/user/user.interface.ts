@@ -1,5 +1,10 @@
 import { Model } from "mongoose";
-import { Order } from "../order/order.interface";
+
+export interface TOrder {
+    productName: string;
+    price: number;
+    quantity: number;
+}
 
 export interface TFullName {
     firstName: string;
@@ -22,13 +27,14 @@ export interface TUser {
     isActive: boolean;
     hobbies: [string];
     address: TAddress,
-    orders: [Order],
+    orders: [TOrder],
     isDeleted: boolean
 }
 
-export interface IUserMethods {
+
+
+
+// static method
+export interface TUserModel extends Model<TUser> {
     isUserExists(userId: number): Promise<TUser | null>;
 }
-
-
-export type TUserModel = Model<TUser, Record<string, never>, IUserMethods>;

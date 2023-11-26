@@ -1,12 +1,12 @@
 import UserModel from "./user.model";
-import { TUser } from "./user.interface";
+import { TOrder, TUser } from "./user.interface";
 
 function getUsers() {
-    return UserModel.find()
+    return UserModel.find().select("-password -isDeleted -_id -fullName._id -address._id -orders -__v")
 }
 
 function getUser(userId: number) {
-    return UserModel.findOne({ userId });
+    return UserModel.findOne({ userId }).select("-password -isDeleted -_id -fullName._id -address._id -orders -__v")
 }
 
 async function createUser(user: TUser) {
@@ -14,7 +14,7 @@ async function createUser(user: TUser) {
 
     const newUser = new UserModel(user);
 
-    if (await newUser.isUserExists(userId)) {
+    if (await UserModel.isUserExists(userId)) {
         throw new Error("User id alredy exist.")
     } else {
         await newUser.save()
@@ -28,14 +28,35 @@ async function createUser(user: TUser) {
 async function updateUser(userId: number, userInfo: TUser) {
     await UserModel.updateOne({ userId }, {
         $set: userInfo
-    }, {new: true})
+    }, { new: true })
 
-    const newData = await UserModel.findOne({userId})
+    const newData = await UserModel.findOne({ userId })
 
     return newData;
 }
 
+function deleteUser(userId: number) {
+    return UserModel.deleteOne({ userId })
+}
+
+async function addOrder(userId: number, orderInfo: TOrder) {
+    if (await UserModel.isUserExists(userId)) {
+        return UserModel.updateOne(
+            { userId },
+            { $push: { orders: orderInfo } },
+            { new: true }
+        )
+    } else {
+        throw new Error("User id not found.")
+    }
+}
+
+function getOrders(userId: number) {
+    return UserModel.findOne({ userId }).select("-_id orders")
+}
+
+
 
 export default {
-    getUsers, getUser, createUser, updateUser
+    getUsers, getOrders, getUser, createUser, updateUser, deleteUser, addOrder
 }

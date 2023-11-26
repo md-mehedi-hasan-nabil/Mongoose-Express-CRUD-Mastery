@@ -24,6 +24,31 @@ async function getAllUsers(req: Request, res: Response) {
     }
 }
 
+/**
+ * all orders for a specific user
+ */
+async function getUserOrders(req: Request, res: Response) {
+    try {
+        const userId = req.params.userId;
+        const orders = await userService.getOrders(Number(userId));
+
+        res.status(200).json({
+            success: true,
+            message: "Order fetched successfully!",
+            data: orders
+        })
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: "Order fetched failed!",
+            error: {
+                "code": 404,
+                "description": "Server side error."
+            }
+        })
+    }
+}
+
 async function getSingleUser(req: Request, res: Response) {
     try {
         const userId = req.params.userId;
@@ -106,8 +131,66 @@ async function updateUserInfo(req: Request, res: Response) {
     }
 }
 
+/**
+ * delete user informstion
+ */
+
+async function deleteUserInfo(req: Request, res: Response) {
+    try {
+        const userId = req.params.userId;
+
+        await userService.deleteUser(Number(userId))
+
+        res.status(200).json({
+            success: true,
+            message: "User deleted successfully!",
+            data: null,
+        });
+
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: "Server side error.",
+            data: null
+        })
+    }
+}
+
+/**
+ * add new product in order
+ */
+async function addNewOrder(req: Request, res: Response) {
+    try {
+        const userId = req.params.userId
+        const { productName, price, quantity } = req.body ||{};
+
+        const result = await userService.addOrder(Number(userId), { productName, price, quantity });
+
+        if (result?.modifiedCount > 0) {
+            res.status(201).json({
+                success: true,
+                message: "Order created successfully!",
+                data: result
+            })
+        } else {
+            throw new Error("Product order failed.")
+        }
+
+
+    } catch (error: any) {
+        res.status(500).json({
+            success: false,
+            message: "order failed.",
+            error: {
+                code: 404,
+                description: error?.message ? error?.message : "Server side error."
+            }
+        })
+    }
+}
+
 
 
 export default {
-    getAllUsers, getSingleUser, createNewUser, updateUserInfo,
+    getAllUsers, getUserOrders, getSingleUser, createNewUser, updateUserInfo, deleteUserInfo, addNewOrder
 }

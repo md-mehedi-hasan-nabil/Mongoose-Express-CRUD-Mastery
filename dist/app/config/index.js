@@ -10,5 +10,6 @@ dotenv_1.default.config({
 });
 exports.default = {
     port: process.env.PORT,
-    db_uri: process.env.DB_URI
+    db_uri: process.env.DB_URI,
+    saltRounds: process.env.SALT_ROUNDS
 };

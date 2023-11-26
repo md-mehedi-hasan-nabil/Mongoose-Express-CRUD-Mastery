@@ -6,7 +6,8 @@ main().catch(err => console.log(err));
 
 async function main() {
     try {
-        await mongoose.connect(config.db_uri as string);
+        // await mongoose.connect(config.db_uri as string);
+        await mongoose.connect("mongodb://127.0.0.1:27017/ph-curd");
 
         console.log("Database connection successful")
 
