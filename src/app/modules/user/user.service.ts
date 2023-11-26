@@ -55,8 +55,19 @@ function getOrders(userId: number) {
     return UserModel.findOne({ userId }).select("-_id orders")
 }
 
-
+function totalPrice(userId: number) {
+    return UserModel.aggregate([
+        { $match: { userId } }, 
+        { $unwind: '$orders' },
+        {
+            $group: {
+                _id: null,
+                totalAmount: { $sum: '$orders.price' },
+            },
+        }
+    ])
+}
 
 export default {
-    getUsers, getOrders, getUser, createUser, updateUser, deleteUser, addOrder
+    getUsers, getOrders, getUser, createUser, updateUser, deleteUser, addOrder, totalPrice
 }

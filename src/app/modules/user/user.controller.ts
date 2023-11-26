@@ -162,7 +162,7 @@ async function deleteUserInfo(req: Request, res: Response) {
 async function addNewOrder(req: Request, res: Response) {
     try {
         const userId = req.params.userId
-        const { productName, price, quantity } = req.body ||{};
+        const { productName, price, quantity } = req.body || {};
 
         const result = await userService.addOrder(Number(userId), { productName, price, quantity });
 
@@ -189,8 +189,42 @@ async function addNewOrder(req: Request, res: Response) {
     }
 }
 
+/**
+ * Calculate Total Price
+ */
+async function calculateTotalPrice(req: Request, res: Response) {
+    try {
+        const userId = req.params.userId;
+        const result = await userService.totalPrice(Number(userId));
 
+        if (result?.length > 0) {
+            if (result[0]?.totalAmount) {
+                res.status(200).json({
+                    success: true,
+                    message: "Total price calculated successfully!",
+                    totalAmount: Number(result[0].totalAmount.toFixed(2))
+                })
+            } else {
+                throw new Error("Price calculation failed.")
+            }
+
+        } else {
+            throw new Error("Price calculation failed.")
+        }
+
+
+    } catch (error: any) {
+        res.status(500).json({
+            success: false,
+            message: "Order price calculate fail.",
+            error: {
+                code: 404,
+                description: error?.message ? error?.message : "Server side error."
+            }
+        })
+    }
+}
 
 export default {
-    getAllUsers, getUserOrders, getSingleUser, createNewUser, updateUserInfo, deleteUserInfo, addNewOrder
+    getAllUsers, getUserOrders, getSingleUser, createNewUser, updateUserInfo, deleteUserInfo, addNewOrder, calculateTotalPrice
 }
