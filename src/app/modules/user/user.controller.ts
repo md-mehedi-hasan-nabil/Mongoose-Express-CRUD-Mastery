@@ -1,7 +1,6 @@
 import { Request, Response } from "express"
 import userService from "./user.service"
-import { TUser } from "./user.interface";
-import userValidationSchema from "./user.validation";
+import  { updateUserValidationSchema , userValidationSchema} from "./user.validation";
 
 async function getAllUsers(req: Request, res: Response) {
     try {
@@ -76,8 +75,7 @@ async function getSingleUser(req: Request, res: Response) {
  */
 async function createNewUser(req: Request, res: Response) {
     try {
-        const { user }: { user: TUser } = req.body;
-        const { error, value } = userValidationSchema.validate(user);
+        const { error, value } = userValidationSchema.validate(req.body);
 
         if (error) {
             return res.status(500).json({
@@ -114,18 +112,31 @@ async function createNewUser(req: Request, res: Response) {
  */
 async function updateUserInfo(req: Request, res: Response) {
     try {
+        const { error, value } = updateUserValidationSchema.validate(req.body);
+
+        if (error) {
+            return res.status(500).json({
+                success: false,
+                message: "User data validation failed.",
+                "error": {
+                    "code": 404,
+                    "description": error?.details
+                }
+            })
+        }
+
         const userId = req.params.userId;
-        const updatedUserInfo = await userService.updateUser(Number(userId), req.body);
+        const updatedUserInfo = await userService.updateUser(Number(userId), value);
 
         res.status(200).json({
             success: true,
             message: "User updated successfully!",
             data: updatedUserInfo,
         });
-    } catch (error) {
+    } catch (error: any) {
         res.status(500).json({
             success: false,
-            message: "Server side error.",
+            message: error?.message ? error.message : "Server side error.",
             data: null
         })
     }

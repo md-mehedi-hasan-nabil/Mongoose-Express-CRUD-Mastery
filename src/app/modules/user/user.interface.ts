@@ -31,8 +31,19 @@ export interface TUser {
     isDeleted: boolean
 }
 
-
-
+export interface TUpdateUser {
+    userId?: number;
+    username?: string;
+    password?: string;
+    fullName: TFullName;
+    age: number;
+    email: string;
+    isActive: boolean;
+    hobbies: [string];
+    address: TAddress,
+    orders: [TOrder],
+    isDeleted: boolean
+}
 
 // static method
 export interface TUserModel extends Model<TUser> {

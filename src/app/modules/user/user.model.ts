@@ -94,23 +94,7 @@ userSchema.pre("save", async function (next) {
     next()
 })
 
-/**
- * find all user
- */
-// userSchema.pre("find", async function (next) {
-//     this.find().select("-password -isDeleted -_id -fullName._id -address._id -orders -__v")
 
-//     next()
-// })
-
-/**
- * find single user
- */
-// userSchema.pre("findOne", async function (next) {
-//     console.log(this.req)
-//     this.find().select("-password -isDeleted -_id -fullName._id -address._id -orders -__v")
-//     next()
-// })
 /**
  * after update operation 
  */

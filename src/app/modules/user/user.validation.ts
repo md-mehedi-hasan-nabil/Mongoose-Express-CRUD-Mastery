@@ -41,7 +41,7 @@ const addressValidationSchema = Joi.object({
     }),
 });
 
-const userValidationSchema = Joi.object({
+export const userValidationSchema = Joi.object({
     userId: Joi.number().required().messages({
         'any.required': 'User id is required.',
         'string.base': 'User id must be a number.',
@@ -73,4 +73,27 @@ const userValidationSchema = Joi.object({
     orders: Joi.array().items(orderValidationSchema),
 });
 
-export default userValidationSchema;
+
+export const updateUserValidationSchema = Joi.object({
+    userId: Joi.number().optional(),
+    username: Joi.string().optional(),
+    password: Joi.string().optional(),
+    fullName: nameValidationSchema,
+    age: Joi.number().required().messages({
+        'any.required': 'Age is required.',
+        'number.base': 'Age must be a number.',
+    }),
+    email: Joi.string().email().required().messages({
+        'any.required': 'Email is required.',
+        'string.base': 'Email must be a string.',
+        'string.email': 'Email must be a valid email address.',
+    }),
+    isActive: Joi.boolean(),
+    hobbies: Joi.array().items(Joi.string()).required().messages({
+        'any.required': 'Hobbies are required.',
+        'array.base': 'Hobbies must be an array.',
+    }),
+    address: addressValidationSchema,
+    orders: Joi.array().items(orderValidationSchema),
+});
+

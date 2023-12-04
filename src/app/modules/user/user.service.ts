@@ -1,5 +1,5 @@
 import UserModel from "./user.model";
-import { TOrder, TUser } from "./user.interface";
+import { TOrder, TUpdateUser, TUser } from "./user.interface";
 
 function getUsers() {
     return UserModel.find().select("-password -isDeleted -_id -fullName._id -address._id -orders -__v")
@@ -30,12 +30,16 @@ async function createUser(user: TUser) {
     return newData;
 }
 
-async function updateUser(userId: number, userInfo: TUser) {
+async function updateUser(userId: number, userInfo: TUpdateUser) {
+    delete userInfo.userId;
+    delete userInfo.username;
+    delete userInfo.password;
+
     await UserModel.updateOne({ userId }, {
         $set: userInfo
     }, { new: true })
 
-    const newData = await UserModel.findOne({ userId })
+    const newData = await UserModel.findOne({ userId }).select("-password -isDeleted -_id -fullName._id -address._id -orders -__v");
 
     return newData;
 }
